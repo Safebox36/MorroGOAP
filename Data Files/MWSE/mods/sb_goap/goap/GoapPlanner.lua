@@ -15,19 +15,23 @@ end
 ---@class Node
 ---@field parent Node | nil
 ---@field runningCost number
----@field state table<string, function>
+---@field state table<string, any>
 ---@field action GoapAction | nil
 local Node = {}
+Node.__index = Node
 
 ---@param parent Node | nil
 ---@param runningCost number
----@param state table<string, function>
+---@param state table<string, any>
 ---@param action GoapAction | nil
-function Node:new(parent, runningCost, state, action)
-	Node.parent = parent
-	Node.runningCost = runningCost
-	Node.state = state
-	Node.action = action
+function Node.new(parent, runningCost, state, action)
+	local self = {
+	parent = parent,
+	runningCost = runningCost,
+	state = state,
+	action = action}
+
+	return setmetatable(self, Node)
 end
 
 --[[
@@ -37,8 +41,8 @@ end
 ]]
 ---@param agent tes3reference
 ---@param availableActions table<GoapAction>
----@param worldState table<string,function>
----@param goal table<string,function>
+---@param worldState table<string,any>
+---@param goal table<string,any>
 ---@return table<GoapAction> | nil
 function GoapPlanner:plan(agent, availableActions, worldState, goal)
 	--reset the actions so we can start fresh with them
@@ -65,11 +69,11 @@ function GoapPlanner:plan(agent, availableActions, worldState, goal)
 
 	--build graph
 	---@type Node
-	local start = assert(Node:new(nil, 0, worldState, nil))
+	local start = assert(Node.new(nil, 0, worldState, nil), "Node.new(nil, 0, worldState, nil)")
 	---@type boolean
 	local success = self:buildGraph(start, leaves, usableActions, goal)
 
-	if (~success) then
+	if (success == false) then
 		--oh no, we didn't get a plan
 		mwse.log("NO PLAN")
 		return nil
@@ -121,7 +125,7 @@ end
 ---@param parent Node
 ---@param leaves table<Node>
 ---@param usableActions table<GoapAction>
----@param goal table<string, function>
+---@param goal table<string, any>
 ---@return boolean
 function GoapPlanner:buildGraph(parent, leaves, usableActions, goal)
 	---@type boolean
@@ -135,10 +139,10 @@ function GoapPlanner:buildGraph(parent, leaves, usableActions, goal)
 		if (self.inState(action:getPreconditions(), parent.state)) then
 
 			--apply the action's effects to the parent state
-			---@type table<string, function>
+			---@type table<string, any>
 			local currentState = self.populateState(parent.state, action:getEffects())
 			---@type Node
-			local node = assert(Node:new(parent, parent.runningCost + action.cost, currentState, action))
+			local node = assert(Node.new(parent, parent.runningCost + action.cost, currentState, action), "Node.new(parent, parent.runningCost + action.cost, currentState, action)")
 
 			if (self.inState(goal, currentState)) then
 				--we found a solution!
@@ -182,26 +186,26 @@ end
 	Check that all items in 'test' are in 'state'. If just one does not match or is not there
 	then this returns false.
 ]]
----@param test table<string, function>
----@param state table<string, function>
+---@param test table<string, any>
+---@param state table<string, any>
 ---@return boolean
 function GoapPlanner.inState(test, state)
 	---@type boolean
 	local allMatch = true
 	---@param tk string
-	---@param tv function
+	---@param tv any
 	for tk, tv in pairs(test) do
 		---@type boolean
 		local match = false
 		---@param sk string
-		---@param sv function
+		---@param sv any
 		for sk, sv in pairs(state) do
 			if (sk == tk and sv == tv) then
 				match = true
 				break
 			end
 		end
-		if (~match) then
+		if (match == false) then
 			allMatch = false
 		end
 	end
@@ -211,21 +215,21 @@ end
 --[[
 	Apply the stateChange to the currentState
 ]]
----@param currentState table<string, function>
----@param stateChange table<string, function>
----@return table<string, function>
+---@param currentState table<string, any>
+---@param stateChange table<string, any>
+---@return table<string, any>
 function GoapPlanner.populateState(currentState, stateChange)
-	---@type table<string, function>
+	---@type table<string, any>
 	local state = {}
 	--copy the KVPs over as new objects
 	---@param sk string
-	---@param sv function
+	---@param sv any
 	for sk, sv in pairs(currentState) do
 		state[sk] = sv
 	end
 
 	---@param changeK string
-	---@param changeV function
+	---@param changeV any
 	for changeK, changeV in pairs(stateChange) do
 		state[changeK] = changeV
 	end

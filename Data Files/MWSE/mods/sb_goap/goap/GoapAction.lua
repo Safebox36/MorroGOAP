@@ -1,8 +1,8 @@
 ---@class GoapAction
 local GoapAction = {
-	---@type table<string,function>
+	---@type table<string,any>
 	preconditions = {},
-	---@type table<string,function>
+	---@type table<string,any>
 	effects = {},
 
 	---@type boolean
@@ -39,7 +39,7 @@ end
 ]]
 --[ABSTRACT METHOD]
 function GoapAction.reset()
-
+    mwse.log("GoapAction.reset() is ABSTRACT")
 end
 
 --[[
@@ -48,6 +48,7 @@ end
 --[ABSTRACT METHOD]
 ---@return boolean
 function GoapAction.isDone()
+    mwse.log("GoapAction.isDone() is ABSTRACT")
 	return false
 end
 
@@ -59,6 +60,7 @@ end
 ---@param agent tes3reference
 ---@return boolean
 function GoapAction.checkProceduralPrecondition(agent)
+    mwse.log("GoapAction.checkProceduralPrecondition(agent) is ABSTRACT")
 	return false
 end
 
@@ -72,6 +74,7 @@ end
 ---@param agent tes3reference
 ---@return boolean
 function GoapAction.perform(agent)
+    mwse.log("GoapAction.perform(agent) is ABSTRACT")
 	return false
 end
 
@@ -82,6 +85,7 @@ end
 --[ABSTRACT METHOD]
 ---@return boolean
 function GoapAction.requiresInRange()
+    mwse.log("GoapAction.requiresInRange() is ABSTRACT")
 	return false
 end
 
@@ -100,7 +104,7 @@ function GoapAction:setInRange(inRange)
 end
 
 ---@param key string
----@param value function
+---@param value any
 function GoapAction:addPrecondition(key, value)
 	self.preconditions[key] = value
 end
@@ -111,7 +115,7 @@ function GoapAction:removePrecondition(key)
 end
 
 ---@param key string
----@param value function
+---@param value any
 function GoapAction:addEffect(key, value)
 	self.effects[key] = value
 end
@@ -121,12 +125,12 @@ function GoapAction:removeEffect(key)
 	self.effects[key] = nil
 end
 
----@return table<string, function>
+---@return table<string, any>
 function GoapAction:getPreconditions()
 	return self.preconditions
 end
 
----@return table<string, function>
+---@return table<string, any>
 function GoapAction:getEffects()
 	return self.effects
 end

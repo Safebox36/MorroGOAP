@@ -15,7 +15,7 @@ end
 ---@param fsm FSM
 ---@param ref tes3reference
 function FSMState.Update(fsm, ref)
-
+    mwse.log("FSMState.Update(fsm, ref) is ABSTRACT")
 end
 
 return FSMState

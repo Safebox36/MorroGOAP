@@ -9,8 +9,6 @@
 local FSM = {
     ---@type table<FSMState>
     stateStack = {},
-    ---@type function<FSM, tes3reference>
-    FSMState = {}
 }
 FSM.__index = FSM
 
@@ -31,7 +29,7 @@ function FSM:pushState(state)
 end
 
 function FSM:popState()
-    table.remove(self.stateStack, 1);
+    table.remove(self.stateStack, 1)
 end
 
 return FSM

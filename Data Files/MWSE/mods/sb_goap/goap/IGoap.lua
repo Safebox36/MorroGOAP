@@ -1,19 +1,5 @@
 ---@class IGoap
-local IGoap = {
-	--[[
-	The starting state of the Agent and the world.
-	Supply what states are needed for actions to run.
-]]
-	---@type table<string,any>
-	getWorldState = nil,
-
-	--[[
-	Give the planner a new goal so it can figure out 
-	the actions needed to fulfill it.
-]]
-	---@type table<string,any>
-	createGoalState = nil
-}
+local IGoap = {}
 IGoap.__index = IGoap
 
 function IGoap.new()
@@ -21,22 +7,45 @@ function IGoap.new()
 end
 
 --[[
+The starting state of the Agent and the world.
+Supply what states are needed for actions to run.
+]]
+--[ABSTRACT METHOD]
+---@return table<string,any>
+function IGoap.getWorldState()
+    mwse.log("IGoap.getWorldState() is ABSTRACT")
+	return {}
+end
+
+--[[
+Give the planner a new goal so it can figure out 
+the actions needed to fulfill it.
+]]
+---@return table<string,any>
+function IGoap.createGoalState()
+    mwse.log("IGoap.createGoalState() is ABSTRACT")
+	return {}
+end
+
+--[[
 	No sequence of actions could be found for the supplied goal.
 	You will need to try another goal
 ]]
+--[ABSTRACT METHOD]
 ---@param failedGoal table<string,any>
 function IGoap.planFailed(failedGoal)
-
+    mwse.log("IGoap.planFailed(failedGoal) is ABSTRACT")
 end
 
 --[[
 	A plan was found for the supplied goal.
 	These are the actions the Agent will perform, in order.
 ]]
+--[ABSTRACT METHOD]
 ---@param goal table<string,any>
 ---@param actions table<GoapAction>
 function IGoap.planFound(goal, actions)
-
+    mwse.log("IGoap.planFound(goal, actions) is ABSTRACT")
 end
 
 --[[
@@ -44,7 +53,7 @@ end
 ]]
 --[ABSTRACT METHOD]
 function IGoap.actionsFinished()
-
+    mwse.log("IGoap.actionsFinished() is ABSTRACT")
 end
 
 --[[
@@ -56,7 +65,7 @@ end
 --[ABSTRACT METHOD]
 ---@param aborter GoapAction
 function IGoap.planAborted(aborter)
-
+    mwse.log("IGoap.planAborted(aborter) is ABSTRACT")
 end
 
 --[[
@@ -71,6 +80,7 @@ end
 ---@param nextAction GoapAction
 ---@return boolean
 function IGoap.moveAgent(nextAction)
+    mwse.log("IGoap.moveAgent(nextAction) is ABSTRACT")
 	return false
 end
 

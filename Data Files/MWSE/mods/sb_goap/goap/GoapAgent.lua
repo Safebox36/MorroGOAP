@@ -27,12 +27,13 @@ function GoapAgent.new()
     return setmetatable({}, GoapAgent)
 end
 
+---@param sb_goap sb_goap
 ---@param refData table<IGoap, table<GoapAction>>
-function GoapAgent:loadedCallback(refData)
-    self.stateMachine = {}
+function GoapAgent:loadedCallback(sb_goap, refData)
+    self.stateMachine = sb_goap.FSM.new()
     self.availableActions = {}
     self.currentActions = {}
-    self.planner = {}
+    self.planner = sb_goap.GoapPlanner.new()
     self:findDataProvider(refData[1])
     self:createIdleState()
     self:createMoveToState()
@@ -77,14 +78,14 @@ function GoapAgent:createIdleState()
     --GOAP planning
 
     --get the world state and the goal we want to plan for
-    ---@type table<string, function>
+    ---@type table<string, any>
     local worldState = self.dataProvider.getWorldState()
-    ---@type table<string, function>
+    ---@type table<string, any>
     local goal = self.dataProvider.createGoalState()
 
     --Plan
     ---@type table<GoapAction>
-    local plan = assert(self.planner:plan(self.idleState.ref, self.availableActions, worldState, goal))
+    local plan = assert(self.planner:plan(self.idleState.ref, self.availableActions, worldState, goal), "self.planner:plan(self.idleState.ref, self.availableActions, worldState, goal)")
     if (plan ~= nil) then
         --we have a plan, hooray!
         self.currentActions = plan
@@ -124,7 +125,7 @@ end
 function GoapAgent:createPerformActionState()
     --perform the action
 
-    if (~self:hasActionPlan()) then
+    if (self:hasActionPlan() == false) then
         --no actions to perform
         mwse.log("Done actions")
         table.remove(self.performActionState.fsm, 1)
@@ -151,7 +152,7 @@ function GoapAgent:createPerformActionState()
             ---@type boolean
             local success = action.perform(self.performActionState.ref)
 
-            if (~success) then
+            if (success == false) then
                 --action failed, we need to plan again
                 table.remove(self.performActionState, 1)
                 table.insert(self.performActionState, self.idleState)
