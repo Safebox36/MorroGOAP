@@ -1,26 +1,31 @@
 ---@class IGoap
-IGoap = {}
-
---[[
+local IGoap = {
+	--[[
 	The starting state of the Agent and the world.
 	Supply what states are needed for actions to run.
 ]]
----@type table<string,any>
-IGoap.getWorldState = nil
+	---@type table<string,any>
+	getWorldState = nil,
 
---[[
+	--[[
 	Give the planner a new goal so it can figure out 
 	the actions needed to fulfill it.
 ]]
----@type table<string,any>
-IGoap.createGoalState = nil
+	---@type table<string,any>
+	createGoalState = nil
+}
+IGoap.__index = IGoap
+
+function IGoap.new()
+	return setmetatable({}, IGoap)
+end
 
 --[[
 	No sequence of actions could be found for the supplied goal.
 	You will need to try another goal
 ]]
 ---@param failedGoal table<string,any>
-function IGoap.planFailed (failedGoal)
+function IGoap.planFailed(failedGoal)
 
 end
 
@@ -30,7 +35,7 @@ end
 ]]
 ---@param goal table<string,any>
 ---@param actions table<GoapAction>
-function IGoap.planFound (goal, actions)
+function IGoap.planFound(goal, actions)
 
 end
 
@@ -69,20 +74,4 @@ function IGoap.moveAgent(nextAction)
 	return false
 end
 
-function IGoap:new()
-    local new_class = {}
-    local class_mt = { __index = new_class }
-
-    function new_class:create()
-        local newinst = {}
-        setmetatable( newinst, class_mt )
-        return newinst
-    end
-
-    if self then
-        setmetatable( new_class, { __index = self } )
-    end
-
-    return new_class
-end
-
+return IGoap

@@ -2,7 +2,12 @@
 Plans what actions can be completed in order to fulfill a goal state.
 ]]
 ---@class GoapPlanner
-GoapPlanner = {}
+local GoapPlanner = {}
+GoapPlanner.__index = GoapPlanner
+
+function GoapPlanner.new()
+	return setmetatable({}, GoapPlanner)
+end
 
 --[[
 	Used for building up the graph and holding the running costs of actions.
@@ -35,15 +40,17 @@ end
 ---@param worldState table<string,function>
 ---@param goal table<string,function>
 ---@return table<GoapAction> | nil
-function GoapPlanner.plan(agent, availableActions, worldState, goal)
+function GoapPlanner:plan(agent, availableActions, worldState, goal)
 	--reset the actions so we can start fresh with them
+	---@param a GoapAction
 	for _, a in ipairs(availableActions) do
-		a.doReset()
+		a:doReset()
 	end
 
 	--check what actions can run using their checkProceduralPrecondition
 	---@type table<GoapAction>
 	local usableActions = {}
+	---@param a GoapAction
 	for _, a in ipairs(availableActions) do
 		if (a.checkProceduralPrecondition(agent)) then
 			table.insert(usableActions, a)
@@ -60,7 +67,7 @@ function GoapPlanner.plan(agent, availableActions, worldState, goal)
 	---@type Node
 	local start = assert(Node:new(nil, 0, worldState, nil))
 	---@type boolean
-	local success = GoapPlanner.buildGraph(start, leaves, usableActions, goal)
+	local success = self:buildGraph(start, leaves, usableActions, goal)
 
 	if (~success) then
 		--oh no, we didn't get a plan
@@ -96,6 +103,7 @@ function GoapPlanner.plan(agent, availableActions, worldState, goal)
 
 	---@type table<GoapAction>
 	local queue = {}
+	---@param a GoapAction
 	for _, a in ipairs(result) do
 		table.insert(queue, a)
 	end
@@ -115,32 +123,33 @@ end
 ---@param usableActions table<GoapAction>
 ---@param goal table<string, function>
 ---@return boolean
-function GoapPlanner.buildGraph(parent, leaves, usableActions, goal)
+function GoapPlanner:buildGraph(parent, leaves, usableActions, goal)
 	---@type boolean
 	local foundOne = false
 
 	--go through each action available at this node and see if we can use it here
+	---@param action GoapAction
 	for _, action in ipairs(usableActions) do
 
 		--if the parent state has the conditions for this action's preconditions, we can use it here
-		if (GoapPlanner.inState(action.Preconditions, parent.state)) then
+		if (self.inState(action:getPreconditions(), parent.state)) then
 
 			--apply the action's effects to the parent state
 			---@type table<string, function>
-			local currentState = GoapPlanner.populateState(parent.state, action.Effects)
+			local currentState = self.populateState(parent.state, action:getEffects())
 			---@type Node
 			local node = assert(Node:new(parent, parent.runningCost + action.cost, currentState, action))
 
-			if (GoapPlanner.inState(goal, currentState)) then
+			if (self.inState(goal, currentState)) then
 				--we found a solution!
 				table.insert(leaves, node)
 				foundOne = true
 			else
 				--not at a solution yet, so test all the remaining actions and branch out the tree
 				---@type table<GoapAction>
-				local subset = GoapPlanner.actionSubset(usableActions, action)
+				local subset = self.actionSubset(usableActions, action)
 				---@type boolean
-				local found = GoapPlanner.buildGraph(node, leaves, subset, goal)
+				local found = GoapPlanner:buildGraph(node, leaves, subset, goal)
 				if (found) then
 					foundOne = true
 				end
@@ -160,8 +169,9 @@ end
 function GoapPlanner.actionSubset(actions, removeMe)
 	---@type table<GoapAction>
 	local subset = {}
+	---@param a GoapAction
 	for _, a in ipairs(actions) do
-		if (~a.Equals(removeMe)) then
+		if (a ~= removeMe) then
 			table.insert(subset, a)
 		end
 	end
@@ -178,9 +188,13 @@ end
 function GoapPlanner.inState(test, state)
 	---@type boolean
 	local allMatch = true
+	---@param tk string
+	---@param tv function
 	for tk, tv in pairs(test) do
 		---@type boolean
 		local match = false
+		---@param sk string
+		---@param sv function
 		for sk, sv in pairs(state) do
 			if (sk == tk and sv == tv) then
 				match = true
@@ -204,12 +218,18 @@ function GoapPlanner.populateState(currentState, stateChange)
 	---@type table<string, function>
 	local state = {}
 	--copy the KVPs over as new objects
+	---@param sk string
+	---@param sv function
 	for sk, sv in pairs(currentState) do
 		state[sk] = sv
 	end
 
+	---@param changeK string
+	---@param changeV function
 	for changeK, changeV in pairs(stateChange) do
 		state[changeK] = changeV
 	end
 	return state
 end
+
+return GoapPlanner

@@ -1,15 +1,21 @@
 ---@class FSMState
-FSMState = {}
+local FSMState = {
+    ---@type FSM
+    fsm = {},
+    ---@type tes3reference
+    ref = {}
+}
+FSMState.__index = FSMState
 
----@type FSM
-FSMState.fsm = {}
-
----@type tes3reference
-FSMState.ref = {}
+function FSMState.new()
+    return setmetatable({}, FSMState)
+end
 
 --[ABSTRACT METHOD]
----@param fsm any
+---@param fsm FSM
 ---@param ref tes3reference
-function FSMState.Update (fsm, ref)
+function FSMState.Update(fsm, ref)
 
 end
+
+return FSMState

@@ -6,26 +6,32 @@
 	and pop themselves off.
 ]]
 ---@class FSM
-FSM = {}
+local FSM = {
+    ---@type table<FSMState>
+    stateStack = {},
+    ---@type function<FSM, tes3reference>
+    FSMState = {}
+}
+FSM.__index = FSM
 
----@type table<FSMState>
-FSM.stateStack = {}
-
----@type function<FSM, tes3reference>
-FSM.FSMState = {}
+function FSM.new()
+    return setmetatable({}, FSM)
+end
 
 ---@param ref tes3reference
-function FSM.Update(ref)
-    if (FSM.stateStack[1] ~= nil) then
-        FSM.stateStack[1].Update(ref)
+function FSM:Update(ref)
+    if (self.stateStack[1] ~= nil) then
+        self.stateStack[1].Update(ref)
     end
 end
 
 ---@param state FSMState
-function FSM.pushState(state)
-    table.insert(FSM.stateStack, 1, state)
+function FSM:pushState(state)
+    table.insert(self.stateStack, 1, state)
 end
 
-function FSM.popState()
-    table.remove(FSM.stateStack, 1);
+function FSM:popState()
+    table.remove(self.stateStack, 1);
 end
+
+return FSM

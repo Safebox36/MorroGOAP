@@ -1,37 +1,37 @@
 ---@class GoapAction
-GoapAction = {}
+local GoapAction = {
+	---@type table<string,function>
+	preconditions = {},
+	---@type table<string,function>
+	effects = {},
 
----@type table<string,function>
-GoapAction.preconditions = {}
----@type table<string,function>
-GoapAction.effects = {}
+	---@type boolean
+	inRange = false,
 
----@type boolean
-GoapAction.inRange = false
-
---[[
+	--[[
 	The cost of performing the action. 
 	Figure out a weight that suits the action. 
 	Changing it will affect what actions are chosen during planning.
 ]]
----@type number
-GoapAction.cost = 1
+	---@type number
+	cost = 1,
 
---[[
+	--[[
 	An action often has to perform on an object. This is that object. Can be null.
 ]]
----@type tes3reference
-GoapAction.target = nil
+	---@type tes3reference
+	target = nil
+}
+GoapAction.__index = GoapAction
 
-function GoapAction:new()
-	GoapAction.preconditions = {}
-	GoapAction.effects = {}
+function GoapAction.new()
+	return setmetatable({}, GoapAction)
 end
 
-function GoapAction.doReset()
-	GoapAction.inRange = false
-	GoapAction.target = nil
-	GoapAction.reset()
+function GoapAction:doReset()
+	self.inRange = false
+	self.target = nil
+	self.reset()
 end
 
 --[[
@@ -90,43 +90,45 @@ end
 	The MoveTo state will set this and it gets reset each time this action is performed.
 ]]
 ---@return boolean
-function GoapAction.isInRange()
-	return GoapAction.inRange
+function GoapAction:isInRange()
+	return self.inRange
 end
 
 ---@param inRange boolean
-function GoapAction.setInRange(inRange)
-	GoapAction.inRange = inRange
+function GoapAction:setInRange(inRange)
+	self.inRange = inRange
 end
 
 ---@param key string
 ---@param value function
-function GoapAction.addPrecondition(key, value)
-	GoapAction.preconditions[key] = value
+function GoapAction:addPrecondition(key, value)
+	self.preconditions[key] = value
 end
 
 ---@param key string
-function GoapAction.removePrecondition(key)
-	GoapAction.preconditions[key] = nil
+function GoapAction:removePrecondition(key)
+	self.preconditions[key] = nil
 end
 
 ---@param key string
 ---@param value function
-function GoapAction.addEffect(key, value)
-	GoapAction.effects[key] = value
+function GoapAction:addEffect(key, value)
+	self.effects[key] = value
 end
 
 ---@param key string
-function GoapAction.removeEffect(key)
-	GoapAction.effects[key] = nil
+function GoapAction:removeEffect(key)
+	self.effects[key] = nil
 end
 
 ---@return table<string, function>
-function GoapAction.getPreconditions()
-	return GoapAction.preconditions
+function GoapAction:getPreconditions()
+	return self.preconditions
 end
 
 ---@return table<string, function>
-function GoapAction.getEffects()
-	return GoapAction.effects
+function GoapAction:getEffects()
+	return self.effects
 end
+
+return GoapAction
