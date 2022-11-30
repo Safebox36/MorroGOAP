@@ -1,15 +1,12 @@
----@class FSMState
-local FSMState = {
-    ---@type FSM
-    fsm = {},
-    ---@type tes3reference
-    ref = {}
-}
-FSMState.__index = FSMState
+local mc = require("sb_goap.utils.middleclass")
 
-function FSMState.new()
-    return setmetatable({}, FSMState)
-end
+---@class FSMState
+local FSMState = mc.class("FSMState")
+
+---@type FSM
+FSMState.fsm = {}
+---@type tes3reference
+FSMState.ref = {}
 
 --[ABSTRACT METHOD]
 ---@param fsm FSM

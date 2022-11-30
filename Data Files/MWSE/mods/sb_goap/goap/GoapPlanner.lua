@@ -1,13 +1,10 @@
+local mc = require("sb_goap.utils.middleclass")
+
 --[[
 Plans what actions can be completed in order to fulfill a goal state.
 ]]
 ---@class GoapPlanner
-local GoapPlanner = {}
-GoapPlanner.__index = GoapPlanner
-
-function GoapPlanner.new()
-	return setmetatable({}, GoapPlanner)
-end
+local GoapPlanner = mc.class("GoapPlanner")
 
 --[[
 	Used for building up the graph and holding the running costs of actions.
@@ -17,21 +14,21 @@ end
 ---@field runningCost number
 ---@field state table<string, any>
 ---@field action GoapAction | nil
-local Node = {}
-Node.__index = Node
+local Node = mc.class("Node")
 
 ---@param parent Node | nil
 ---@param runningCost number
 ---@param state table<string, any>
 ---@param action GoapAction | nil
-function Node.new(parent, runningCost, state, action)
-	local self = {
-	parent = parent,
-	runningCost = runningCost,
-	state = state,
-	action = action}
+function Node.init(parent, runningCost, state, action)
+	local self = Node:new()
 
-	return setmetatable(self, Node)
+	self.parent = parent
+	self.runningCost = runningCost
+	self.state = state
+	self.action = action
+
+	return self
 end
 
 --[[
@@ -69,7 +66,7 @@ function GoapPlanner:plan(agent, availableActions, worldState, goal)
 
 	--build graph
 	---@type Node
-	local start = assert(Node.new(nil, 0, worldState, nil), "Node.new(nil, 0, worldState, nil)")
+	local start = assert(Node.init(nil, 0, worldState, nil), "Node.init(nil, 0, worldState, nil)")
 	---@type boolean
 	local success = self:buildGraph(start, leaves, usableActions, goal)
 
@@ -142,7 +139,8 @@ function GoapPlanner:buildGraph(parent, leaves, usableActions, goal)
 			---@type table<string, any>
 			local currentState = self.populateState(parent.state, action:getEffects())
 			---@type Node
-			local node = assert(Node.new(parent, parent.runningCost + action.cost, currentState, action), "Node.new(parent, parent.runningCost + action.cost, currentState, action)")
+			local node = assert(Node.init(parent, parent.runningCost + action.cost, currentState, action),
+				"Node.init(parent, parent.runningCost + action.cost, currentState, action)")
 
 			if (self.inState(goal, currentState)) then
 				--we found a solution!

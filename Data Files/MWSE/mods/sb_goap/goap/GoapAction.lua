@@ -1,32 +1,29 @@
+local mc = require("sb_goap.utils.middleclass")
+
 ---@class GoapAction
-local GoapAction = {
-	---@type table<string,any>
-	preconditions = {},
-	---@type table<string,any>
-	effects = {},
+local GoapAction = mc.class("GoapAction")
 
-	---@type boolean
-	inRange = false,
+---@type table<string,any>
+GoapAction.preconditions = {}
+---@type table<string,any>
+GoapAction.effects = {}
 
-	--[[
+---@type boolean
+GoapAction.inRange = false
+
+--[[
 	The cost of performing the action. 
 	Figure out a weight that suits the action. 
 	Changing it will affect what actions are chosen during planning.
 ]]
-	---@type number
-	cost = 1,
+---@type number
+GoapAction.cost = 1
 
-	--[[
+--[[
 	An action often has to perform on an object. This is that object. Can be null.
 ]]
-	---@type tes3reference
-	target = nil
-}
-GoapAction.__index = GoapAction
-
-function GoapAction.new()
-	return setmetatable({}, GoapAction)
-end
+---@type tes3reference
+GoapAction.target = nil
 
 function GoapAction:doReset()
 	self.inRange = false
@@ -39,7 +36,7 @@ end
 ]]
 --[ABSTRACT METHOD]
 function GoapAction.reset()
-    mwse.log("GoapAction.reset() is ABSTRACT")
+	mwse.log("GoapAction.reset() is ABSTRACT")
 end
 
 --[[
@@ -48,7 +45,7 @@ end
 --[ABSTRACT METHOD]
 ---@return boolean
 function GoapAction.isDone()
-    mwse.log("GoapAction.isDone() is ABSTRACT")
+	mwse.log("GoapAction.isDone() is ABSTRACT")
 	return false
 end
 
@@ -60,7 +57,7 @@ end
 ---@param agent tes3reference
 ---@return boolean
 function GoapAction.checkProceduralPrecondition(agent)
-    mwse.log("GoapAction.checkProceduralPrecondition(agent) is ABSTRACT")
+	mwse.log("GoapAction.checkProceduralPrecondition(agent) is ABSTRACT")
 	return false
 end
 
@@ -74,7 +71,7 @@ end
 ---@param agent tes3reference
 ---@return boolean
 function GoapAction.perform(agent)
-    mwse.log("GoapAction.perform(agent) is ABSTRACT")
+	mwse.log("GoapAction.perform(agent) is ABSTRACT")
 	return false
 end
 
@@ -85,7 +82,7 @@ end
 --[ABSTRACT METHOD]
 ---@return boolean
 function GoapAction.requiresInRange()
-    mwse.log("GoapAction.requiresInRange() is ABSTRACT")
+	mwse.log("GoapAction.requiresInRange() is ABSTRACT")
 	return false
 end
 

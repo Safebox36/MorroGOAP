@@ -1,39 +1,37 @@
+local mc = require("sb_goap.utils.middleclass")
+local FSM = require("sb_goap.fsm.FSM")
+local GoapPlanner = require("sb_goap.goap.GoapPlanner")
+
 ---@class GoapAgent
-local GoapAgent = {
-    ---@type FSM
-    stateMachine = {},
+local GoapAgent = mc.class("GoapAgent")
 
-    ---@type FSMState
-    idleState = {}, --finds something to do
-    ---@type FSMState
-    moveToState = {}, --moves to a target
-    ---@type FSMState
-    performActionState = {}, --performs an action
+---@type FSM
+GoapAgent.stateMachine = {}
 
-    ---@type table<GoapAction>
-    availableActions = {},
-    ---@type table<GoapAction>
-    currentActions = {},
+---@type FSMState
+GoapAgent.idleState = {} --finds something to do
+---@type FSMState
+GoapAgent.moveToState = {} --moves to a target
+---@type FSMState
+GoapAgent.performActionState = {} --performs an action
 
-    ---@type IGoap
-    dataProvider = {}, --this is the implementing class that provides our world data and listens to feedback on planning
+---@type table<GoapAction>
+GoapAgent.availableActions = {}
+---@type table<GoapAction>
+GoapAgent.currentActions = {}
 
-    ---@type GoapPlanner
-    planner = {}
-}
-GoapAgent.__index = GoapAgent
+---@type IGoap
+GoapAgent.dataProvider = {} --this is the implementing class that provides our world data and listens to feedback on planning
 
-function GoapAgent.new()
-    return setmetatable({}, GoapAgent)
-end
+---@type GoapPlanner
+GoapAgent.planner = {}
 
----@param sb_goap sb_goap
 ---@param refData table<IGoap, table<GoapAction>>
-function GoapAgent:loadedCallback(sb_goap, refData)
-    self.stateMachine = sb_goap.FSM.new()
+function GoapAgent:loadedCallback(refData)
+    self.stateMachine = FSM:new()
     self.availableActions = {}
     self.currentActions = {}
-    self.planner = sb_goap.GoapPlanner.new()
+    self.planner = GoapPlanner:new()
     self:findDataProvider(refData[1])
     self:createIdleState()
     self:createMoveToState()
@@ -85,7 +83,8 @@ function GoapAgent:createIdleState()
 
     --Plan
     ---@type table<GoapAction>
-    local plan = assert(self.planner:plan(self.idleState.ref, self.availableActions, worldState, goal), "self.planner:plan(self.idleState.ref, self.availableActions, worldState, goal)")
+    local plan = assert(self.planner:plan(self.idleState.ref, self.availableActions, worldState, goal),
+        "self.planner:plan(self.idleState.ref, self.availableActions, worldState, goal)")
     if (plan ~= nil) then
         --we have a plan, hooray!
         self.currentActions = plan

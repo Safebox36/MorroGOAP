@@ -1,3 +1,5 @@
+local mc = require("sb_goap.utils.middleclass")
+
 --[[
 	Stack-based Finite State Machine.
 	Push and pop states to the FSM.
@@ -6,15 +8,10 @@
 	and pop themselves off.
 ]]
 ---@class FSM
-local FSM = {
-    ---@type table<FSMState>
-    stateStack = {},
-}
-FSM.__index = FSM
+local FSM = mc.class("FSM")
 
-function FSM.new()
-    return setmetatable({}, FSM)
-end
+---@type table<FSMState>
+FSM.stateStack = {}
 
 ---@param ref tes3reference
 function FSM:Update(ref)

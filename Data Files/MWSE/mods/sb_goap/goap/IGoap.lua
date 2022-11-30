@@ -1,10 +1,7 @@
----@class IGoap
-local IGoap = {}
-IGoap.__index = IGoap
+local mc = require("sb_goap.utils.middleclass")
 
-function IGoap.new()
-	return setmetatable({}, IGoap)
-end
+---@class IGoap
+local IGoap = mc.class("IGoap")
 
 --[[
 The starting state of the Agent and the world.
@@ -13,7 +10,7 @@ Supply what states are needed for actions to run.
 --[ABSTRACT METHOD]
 ---@return table<string,any>
 function IGoap.getWorldState()
-    mwse.log("IGoap.getWorldState() is ABSTRACT")
+	mwse.log("IGoap.getWorldState() is ABSTRACT")
 	return {}
 end
 
@@ -23,7 +20,7 @@ the actions needed to fulfill it.
 ]]
 ---@return table<string,any>
 function IGoap.createGoalState()
-    mwse.log("IGoap.createGoalState() is ABSTRACT")
+	mwse.log("IGoap.createGoalState() is ABSTRACT")
 	return {}
 end
 
@@ -34,7 +31,7 @@ end
 --[ABSTRACT METHOD]
 ---@param failedGoal table<string,any>
 function IGoap.planFailed(failedGoal)
-    mwse.log("IGoap.planFailed(failedGoal) is ABSTRACT")
+	mwse.log("IGoap.planFailed(failedGoal) is ABSTRACT")
 end
 
 --[[
@@ -45,7 +42,7 @@ end
 ---@param goal table<string,any>
 ---@param actions table<GoapAction>
 function IGoap.planFound(goal, actions)
-    mwse.log("IGoap.planFound(goal, actions) is ABSTRACT")
+	mwse.log("IGoap.planFound(goal, actions) is ABSTRACT")
 end
 
 --[[
@@ -53,7 +50,7 @@ end
 ]]
 --[ABSTRACT METHOD]
 function IGoap.actionsFinished()
-    mwse.log("IGoap.actionsFinished() is ABSTRACT")
+	mwse.log("IGoap.actionsFinished() is ABSTRACT")
 end
 
 --[[
@@ -65,7 +62,7 @@ end
 --[ABSTRACT METHOD]
 ---@param aborter GoapAction
 function IGoap.planAborted(aborter)
-    mwse.log("IGoap.planAborted(aborter) is ABSTRACT")
+	mwse.log("IGoap.planAborted(aborter) is ABSTRACT")
 end
 
 --[[
@@ -80,7 +77,7 @@ end
 ---@param nextAction GoapAction
 ---@return boolean
 function IGoap.moveAgent(nextAction)
-    mwse.log("IGoap.moveAgent(nextAction) is ABSTRACT")
+	mwse.log("IGoap.moveAgent(nextAction) is ABSTRACT")
 	return false
 end
 
