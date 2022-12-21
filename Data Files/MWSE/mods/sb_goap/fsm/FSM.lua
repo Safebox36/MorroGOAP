@@ -1,4 +1,5 @@
 local mc = require("sb_goap.utils.middleclass")
+local Stack = require("sb_goap.utils.Stack")
 
 --[[
 	Stack-based Finite State Machine.
@@ -10,23 +11,25 @@ local mc = require("sb_goap.utils.middleclass")
 ---@class FSM
 local FSM = mc.class("FSM")
 
----@type table<FSMState>
-FSM.stateStack = {}
+function FSM:initialize()
+    ---@type Stack FSMState
+    self.stateStack = Stack:new()
+end
 
 ---@param ref tes3reference
 function FSM:Update(ref)
-    if (self.stateStack[1] ~= nil) then
-        self.stateStack[1].Update(ref)
+    if (self.stateStack:peek() ~= nil) then
+        self.stateStack:peek()(self, ref)
     end
 end
 
 ---@param state FSMState
 function FSM:pushState(state)
-    table.insert(self.stateStack, 1, state)
+    self.stateStack:push(state)
 end
 
 function FSM:popState()
-    table.remove(self.stateStack, 1)
+    self.stateStack:pop()
 end
 
 return FSM
